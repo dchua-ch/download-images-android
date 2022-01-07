@@ -24,8 +24,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //externalUrl = "https://www.iss.nus.edu.sg/graduate-programmes/programme/detail/graduate-diploma-in-systems-analysis";
-        //externalUrl = "https://www.google.com";
         externalUrl = "https://stocksnap.io/";
 
         mWebView = findViewById(R.id.web_view);
@@ -39,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         getSrcBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getImgSrcs(mWebView);
+                getImgURLs(mWebView);
 
             }
         });
@@ -48,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void getImgSrcs(WebView webView) {
+    public void getImgURLs(WebView webView) {
 
         String javascriptFn = "(function() {let imageNodes = document.querySelectorAll(\"img\"); " +
                               "let imageSrcs = new Array(); " +
