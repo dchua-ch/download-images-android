@@ -18,6 +18,16 @@
         app:layout_constraintTop_toTopOf="parent"
 
         />
+    <ProgressBar
+        style="@android:style/Widget.Material.Light.ProgressBar.Horizontal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/progress_bar"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:visibility="gone"
+        tools:visibility="visible"/>
 
     <Button
         android:id="@+id/getSrcBtn"

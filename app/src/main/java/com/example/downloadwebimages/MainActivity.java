@@ -7,10 +7,12 @@ import android.os.Bundle;
 import android.util.JsonReader;
 import android.view.View;
 import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.ProgressBar;
 
 import java.io.StringReader;
 
@@ -18,7 +20,9 @@ public class MainActivity extends AppCompatActivity {
     //public static final String EXTERNAL_URL = "externalUrl";
     private String externalUrl;
     private WebView mWebView;
+    private ProgressBar mProgressBar;
     private Button getSrcBtn;
+    private String imageURLs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,14 +37,36 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setJavaScriptEnabled(true);
         mWebView.setWebViewClient(new WebViewClient());
         mWebView.loadUrl(externalUrl);
+        System.out.println("Done loading?");
+        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         getSrcBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 getImgURLs(mWebView);
+                printImageURLs();
 
             }
         });
+
+
+        mWebView.setWebChromeClient( new WebChromeClient() {
+                                         @Override
+                                         public void onProgressChanged( WebView webView, int newProgress) {
+                 if(newProgress == 100) {
+                     mProgressBar.setVisibility(View.GONE);
+                 }
+                 else {
+                     mProgressBar.setVisibility(View.VISIBLE);
+                     mProgressBar.setProgress(newProgress);
+                 }
+             }
+         }
+
+
+        );
+
+
 
 
 
@@ -55,11 +81,22 @@ public class MainActivity extends AppCompatActivity {
         webView.evaluateJavascript(javascriptFn, new ValueCallback<String>() {
             @Override
             public void onReceiveValue(String s) {
-                System.out.println(s);
+               //System.out.println(s);
+                imageURLs = s;
             }
         });
 
 
+    }
+
+    public void printImageURLs() {
+        System.out.println(imageURLs);
+        try {
+            System.out.println("String Length = " + imageURLs.length());
+        }
+        catch (Exception e) {
+            System.out.println("Error. Probably not done loading");
+        }
     }
 
 }
