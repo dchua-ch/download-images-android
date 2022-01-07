@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private WebView mWebView;
     private ProgressBar mProgressBar;
     private Button getSrcBtn;
+    private Button printUrlBtn;
     private String imageURLs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,22 +33,41 @@ public class MainActivity extends AppCompatActivity {
 
         mWebView = findViewById(R.id.web_view);
         getSrcBtn = findViewById(R.id.getSrcBtn);
+        printUrlBtn = findViewById(R.id.printImgUrlBtn);
+
+        printUrlBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                printImageURLs();
+            }
+        });
 
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-        mWebView.setWebViewClient(new WebViewClient());
-        mWebView.loadUrl(externalUrl);
-        System.out.println("Done loading?");
-        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
-
-        getSrcBtn.setOnClickListener(new View.OnClickListener() {
+        mWebView.setWebViewClient(new WebViewClient() {
             @Override
-            public void onClick(View view) {
-                getImgURLs(mWebView);
-                printImageURLs();
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view,url);
+                System.out.println("page finished loading");
+                getSrcBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        getImgURLs(mWebView);
+
+
+                    }
+                });
+
 
             }
-        });
+        }
+
+        );
+        mWebView.loadUrl(externalUrl);
+
+        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
+
+
 
 
         mWebView.setWebChromeClient( new WebChromeClient() {
@@ -81,7 +101,8 @@ public class MainActivity extends AppCompatActivity {
         webView.evaluateJavascript(javascriptFn, new ValueCallback<String>() {
             @Override
             public void onReceiveValue(String s) {
-               //System.out.println(s);
+                System.out.println("Callback for getImgURLs");
+                System.out.println(s);
                 imageURLs = s;
             }
         });
@@ -90,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void printImageURLs() {
+        System.out.println("Executing printImageURLs");
         System.out.println(imageURLs);
         try {
             System.out.println("String Length = " + imageURLs.length());
