@@ -1,8 +1,10 @@
 package com.example.downloadwebimages;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.JsonReader;
 import android.view.View;
@@ -57,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 });
+                getSrcBtn.setText("Get Image URLs");
+                getSrcBtn.setBackgroundColor(Color.parseColor("#2a9d95"));
 
 
             }

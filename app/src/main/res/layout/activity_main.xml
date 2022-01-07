@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:backgroundTint="#009688"
     tools:context=".MainActivity">
 
     <WebView
@@ -18,22 +19,24 @@
         app:layout_constraintTop_toTopOf="parent"
 
         />
+
     <ProgressBar
+        android:id="@+id/progress_bar"
         style="@android:style/Widget.Material.Light.ProgressBar.Horizontal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:id="@+id/progress_bar"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:visibility="gone"
-        tools:visibility="visible"/>
+        tools:visibility="visible" />
 
     <Button
         android:id="@+id/getSrcBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Get Image URLs"
+        android:backgroundTint="#1D2B3333"
+        android:text="Loading..."
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -44,12 +47,12 @@
         android:id="@+id/printImgUrlBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:backgroundTint="#03A9F4"
         android:text="Print Image URLs"
-        app:layout_constraintTop_toBottomOf="@id/getSrcBtn"
-        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
 
-        />
+        app:layout_constraintTop_toBottomOf="@id/getSrcBtn" />
 
 
     <!--android:visibility="gone"-->
