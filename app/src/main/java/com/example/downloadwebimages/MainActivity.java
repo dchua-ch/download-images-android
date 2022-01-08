@@ -3,6 +3,7 @@ package com.example.downloadwebimages;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,7 +11,9 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.JsonReader;
+import android.util.Patterns;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -22,6 +25,7 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.StringReader;
@@ -50,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        externalUrl = "https://stocksnap.io/";
+
 
         mWebView = findViewById(R.id.web_view);
         getSrcBtn = findViewById(R.id.getSrcBtn);
@@ -66,9 +70,17 @@ public class MainActivity extends AppCompatActivity {
         getSrcBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                externalUrl =urlInput.getText().toString();
-                if(URLUtil.isValidUrl(externalUrl))
+                hideSoftKeyboard(MainActivity.this);
+                externalUrl ="https://" + urlInput.getText().toString();
+                System.out.println("External URL = " + externalUrl);
+                if(Patterns.WEB_URL.matcher(externalUrl).matches()) {
+                    Toast.makeText(MainActivity.this, "Beginning download...", Toast.LENGTH_LONG).show();
                     loadPage();
+                }
+                else {
+                    Toast.makeText(MainActivity.this,"URL invalid",Toast.LENGTH_LONG).show();
+                }
+
 
             }
         });
@@ -85,6 +97,8 @@ public class MainActivity extends AppCompatActivity {
                                       public void onPageFinished(WebView view, String url) {
                                       super.onPageFinished(view,url);
                                       System.out.println("page finished loading");
+
+                                      // Begin download process
                                       getImgURLs(mWebView);
 
 
@@ -92,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
                                       }
                                   }
         );
+        System.out.println("External URL in loadPage() = " + externalUrl);
         mWebView.loadUrl(externalUrl);
     }
 
@@ -104,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onReceiveValue(String s) {
                 System.out.println("Callback for getImgURLs");
+                externalUrl = null;
                 imageURLs = s;
                 printImageURLs();
                 processImageUrlString();
@@ -233,6 +249,17 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+    }
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) activity.getSystemService(
+                        Activity.INPUT_METHOD_SERVICE);
+        if(inputMethodManager.isAcceptingText()){
+            inputMethodManager.hideSoftInputFromWindow(
+                    activity.getCurrentFocus().getWindowToken(),
+                    0
+            );
+        }
     }
 
 }

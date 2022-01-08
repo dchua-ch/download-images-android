@@ -31,8 +31,10 @@
         android:text=""
 
         app:layout_constraintBottom_toBottomOf="@+id/getSrcBtn"
+        app:layout_constraintTop_toTopOf="@+id/getSrcBtn"
         app:layout_constraintEnd_toStartOf="@+id/getSrcBtn"
-        app:layout_constraintHorizontal_bias="0.528"
+
+
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
