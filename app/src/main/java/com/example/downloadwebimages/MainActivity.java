@@ -17,6 +17,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private String externalUrl;
     private WebView mWebView;
     private GridView gridView;
+    private EditText urlInput;
     private ProgressBar mProgressBar;
     private Button getSrcBtn;
 
@@ -52,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
         mWebView = findViewById(R.id.web_view);
         getSrcBtn = findViewById(R.id.getSrcBtn);
         gridView = findViewById(R.id.gridView);
+        urlInput = findViewById(R.id.urlInput);
 
 
         WebSettings webSettings = mWebView.getSettings();
@@ -64,7 +67,9 @@ public class MainActivity extends AppCompatActivity {
                 getSrcBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        getImgURLs(mWebView);
+                       // externalUrl = urlInput.getText().toString();
+                        if(externalUrl != null)
+                            getImgURLs(mWebView);
                     }
                 });
                 getSrcBtn.setText("Get Image URLs");
