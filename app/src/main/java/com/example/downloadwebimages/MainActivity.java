@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
@@ -15,6 +17,8 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import java.io.File;
@@ -27,11 +31,14 @@ public class MainActivity extends AppCompatActivity {
     //public static final String EXTERNAL_URL = "externalUrl";
     private String externalUrl;
     private WebView mWebView;
+    private GridView gridView;
     private ProgressBar mProgressBar;
     private Button getSrcBtn;
 
     private String imageURLs;
     private String[] imageURLArray;
+    private ArrayList<Bitmap> imageBitmaps;
+    private ArrayList<File> destFiles;
 
     private ArrayList<String> destFileArray;
     @Override
@@ -43,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
         mWebView = findViewById(R.id.web_view);
         getSrcBtn = findViewById(R.id.getSrcBtn);
+        gridView = findViewById(R.id.gridView);
 
 
         WebSettings webSettings = mWebView.getSettings();
@@ -56,25 +64,16 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         getImgURLs(mWebView);
-
-
-
                     }
                 });
                 getSrcBtn.setText("Get Image URLs");
                 getSrcBtn.setBackgroundColor(Color.parseColor("#2a9d95"));
-
-
             }
         }
-
         );
         mWebView.loadUrl(externalUrl);
 
         mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
-
-
-
 
         mWebView.setWebChromeClient( new WebChromeClient() {
                                          @Override
@@ -92,10 +91,6 @@ public class MainActivity extends AppCompatActivity {
 
         );
 
-
-
-
-
     }
 
     public void getImgURLs(WebView webView) {
@@ -108,12 +103,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onReceiveValue(String s) {
                 System.out.println("Callback for getImgURLs");
-                //System.out.println(s);
                 imageURLs = s;
                 printImageURLs();
                 processImageUrlString();
-                //printImageURLs();
                 downloadImages();
+
 
             }
         });
@@ -154,8 +148,8 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 System.out.println("entering new thread");
                 String destFilename;
-                File destFile;
-                File dir =getExternalFilesDir(Environment.DIRECTORY_PICTURES);;
+                File destFile = null;
+                File dir =getExternalFilesDir(Environment.DIRECTORY_PICTURES);
                 File[] existingFiles = dir.listFiles();
                 // Delete existing images from directory
                 for(File file : existingFiles) {
@@ -175,18 +169,76 @@ public class MainActivity extends AppCompatActivity {
                 int counter = 0;
                 DecimalFormat df = new DecimalFormat("00");
                 for (String imgURL : imageURLArray) {
-                    //destFilename =  "image_" + df.format(counter) + "_" + UUID.randomUUID().toString() + imgURL.lastIndexOf(".") + 1;
                     destFilename =  "image_" + df.format(counter);
                     counter++;
                     System.out.println("Downloading image from: " + imgURL);
 
                     destFile = new File(dir,destFilename);
 
+
                     if(downloader.downloadImage(imgURL,destFile))
                     {
                         System.out.println("Downloaded file: " + destFilename);
+
+
                     }
 
+                }
+                boolean finishedDownloading = true;
+
+                if(finishedDownloading) {
+                    System.out.println("Starting runOnUiThread");
+                    File finalDestFile = destFile;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+
+
+                            File dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+                            File[] existingFiles = dir.listFiles();
+                            // note that with each reload, stocksnap images may change o.o
+                            System.out.println("Trying to decode file: " + existingFiles[18].getAbsolutePath());
+                            Bitmap bitmap = BitmapFactory.decodeFile(existingFiles[18].getAbsolutePath());
+
+                            ImageView imageView = findViewById(R.id.imageViewTest);
+                            imageView.setImageBitmap(bitmap);
+                            //imageBitmaps.add(bitmap);
+
+                            /*File dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+                            File[] existingFiles;
+                            existingFiles = dir.listFiles();
+                            System.out.println("Existing files length = " + existingFiles.length);
+                            for (File imgFile : existingFiles) {
+
+                                try{
+                                    if(imgFile.exists()){
+                                        System.out.println("Trying to decode imgFile: " + imgFile.getAbsolutePath());
+                                        Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                                        //imageBitmaps.add(bitmap);
+
+                                    }
+                                }
+                                catch(Exception e){
+                                    e.printStackTrace();
+                                }
+
+
+                                //imageBitmaps.add(bitmap);
+                            }
+                            MyAdapter adapter = new MyAdapter(MainActivity.this,imageBitmaps);
+                            if(gridView != null)
+                            {
+                                gridView.setAdapter(adapter);
+
+                            }*/
+                            MyAdapter adapter = new MyAdapter(MainActivity.this);
+                            if(gridView != null)
+                            {
+                                gridView.setAdapter(adapter);
+
+                            }
+                            }
+                    });
                 }
             }
 

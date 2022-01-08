@@ -44,8 +44,32 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.12" />
 
+    <ImageView
+        android:id="@+id/imageViewTest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/getSrcBtn"
+        android:visibility="gone"
+         />
 
-    <!--android:visibility="gone"-->
+
+    <GridView
+        android:id="@+id/gridView"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:numColumns="4"
+        app:layout_constraintTop_toBottomOf="@id/getSrcBtn"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        />
+
+
+<!--    android:visibility="gone"-->
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
