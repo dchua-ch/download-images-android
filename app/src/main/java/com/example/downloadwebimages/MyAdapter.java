@@ -27,7 +27,18 @@ public class MyAdapter extends ArrayAdapter {
     public MyAdapter(Context context) {
         super(context, R.layout.grid_element);
         this.context = context;
+        setImgBitmapsFromExtStorage();
 
+
+
+
+
+
+
+        addAll(new Object[imgBitmaps.size()]);
+    }
+
+    private void setImgBitmapsFromExtStorage() {
         dir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         existingFiles = dir.listFiles();
         for (File imgFile : existingFiles) {
@@ -39,7 +50,7 @@ public class MyAdapter extends ArrayAdapter {
                     options.inSampleSize = 8;
                     System.out.println("Trying to decode imgFile: " + imgFile.getAbsolutePath());
                     bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                    if(bitmap != null){
+                    if (bitmap != null) {
                         System.out.println("Decoding successful");
                         imgBitmaps.add(bitmap);
                     }
@@ -50,11 +61,7 @@ public class MyAdapter extends ArrayAdapter {
                 e.printStackTrace();
             }
 
-
-
-
         }
-        addAll(new Object[imgBitmaps.size()]);
     }
 
     public MyAdapter(Context context, ArrayList<Bitmap>  imgBitmaps) {

@@ -37,10 +37,11 @@ public class MainActivity extends AppCompatActivity {
 
     private String imageURLs;
     private String[] imageURLArray;
-    private ArrayList<Bitmap> imageBitmaps;
-    private ArrayList<File> destFiles;
 
-    private ArrayList<String> destFileArray;
+    private ArrayList<Bitmap> imageBitmaps = new ArrayList<Bitmap>();
+    private ArrayList<File> destFiles = new ArrayList<File>();
+
+    private ArrayList<String> destFileArray = new ArrayList<String>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,23 +74,7 @@ public class MainActivity extends AppCompatActivity {
         );
         mWebView.loadUrl(externalUrl);
 
-        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
-        mWebView.setWebChromeClient( new WebChromeClient() {
-                                         @Override
-                                         public void onProgressChanged( WebView webView, int newProgress) {
-                 if(newProgress == 100) {
-                     mProgressBar.setVisibility(View.GONE);
-                 }
-                 else {
-                     mProgressBar.setVisibility(View.VISIBLE);
-                     mProgressBar.setProgress(newProgress);
-                 }
-             }
-         }
-
-
-        );
 
     }
 
@@ -99,7 +84,12 @@ public class MainActivity extends AppCompatActivity {
                               "let imageSrcs = new Array(); " +
                               "for (let i = 0; i < 20; i++) {imageSrcs.push(imageNodes[i].src);} " +
                               "return imageSrcs; })()";
-        webView.evaluateJavascript(javascriptFn, new ValueCallback<String>() {
+
+        String javascriptFn2 = "(function() {let imageNodes = document.querySelectorAll(\"img\"); " +
+                                "let imageSrcs = new Array(); " +
+                                "imageNodes.forEach(imageNode => imageSrcs.push(imageNode.src));" +
+                                "return imageSrcs; })()";
+        webView.evaluateJavascript(javascriptFn2, new ValueCallback<String>() {
             @Override
             public void onReceiveValue(String s) {
                 System.out.println("Callback for getImgURLs");
@@ -132,10 +122,33 @@ public class MainActivity extends AppCompatActivity {
                                  .replace("[","")
                                  .replace("]","")
                                  .split(",");
+
+
         System.out.println("Length of imageURLArray = " + imageURLArray.length);
+        String[] tempStringArray = new String[20];
+        int counter = 0;
         for (String url : imageURLArray) {
+           /* String fileType = url.substring(url.lastIndexOf("."));
+            System.out.println(url.substring(url.lastIndexOf(".")));*/
+            if(counter > 19){
+                break;
+            }
+            else if(url.contains(".jpg") || url.contains(".png"))
+            {
+                tempStringArray[counter] = url;
+                counter++;
+            }
+
+        }
+        imageURLArray = tempStringArray;
+        System.out.println("After processing image URLs");
+        for (String url : imageURLArray){
             System.out.println(url);
         }
+
+
+
+
 
     }
     public void downloadImages() {
@@ -147,25 +160,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 System.out.println("entering new thread");
+                deleteExistingImgFiles();
                 String destFilename;
                 File destFile = null;
                 File dir =getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-                File[] existingFiles = dir.listFiles();
-                // Delete existing images from directory
-                for(File file : existingFiles) {
-                    try{
-                        if(file.exists()) {
-                            System.out.print("Deleting file : " + file.getName());
-                            boolean result = file.delete();
-                            if(result) {
-                                System.out.println(", successful");
-                            }
-                        }
-                    }
-                    catch (Exception e) {
-                        System.out.println("Error while deleting file");
-                    }
-                }
+
                 int counter = 0;
                 DecimalFormat df = new DecimalFormat("00");
                 for (String imgURL : imageURLArray) {
@@ -184,53 +183,10 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                 }
-                boolean finishedDownloading = true;
-
-                if(finishedDownloading) {
-                    System.out.println("Starting runOnUiThread");
-                    File finalDestFile = destFile;
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
 
-
-                            File dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-                            File[] existingFiles = dir.listFiles();
-                            // note that with each reload, stocksnap images may change o.o
-                            System.out.println("Trying to decode file: " + existingFiles[18].getAbsolutePath());
-                            Bitmap bitmap = BitmapFactory.decodeFile(existingFiles[18].getAbsolutePath());
-
-                            ImageView imageView = findViewById(R.id.imageViewTest);
-                            imageView.setImageBitmap(bitmap);
-                            //imageBitmaps.add(bitmap);
-
-                            /*File dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-                            File[] existingFiles;
-                            existingFiles = dir.listFiles();
-                            System.out.println("Existing files length = " + existingFiles.length);
-                            for (File imgFile : existingFiles) {
-
-                                try{
-                                    if(imgFile.exists()){
-                                        System.out.println("Trying to decode imgFile: " + imgFile.getAbsolutePath());
-                                        Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                                        //imageBitmaps.add(bitmap);
-
-                                    }
-                                }
-                                catch(Exception e){
-                                    e.printStackTrace();
-                                }
-
-
-                                //imageBitmaps.add(bitmap);
-                            }
-                            MyAdapter adapter = new MyAdapter(MainActivity.this,imageBitmaps);
-                            if(gridView != null)
-                            {
-                                gridView.setAdapter(adapter);
-
-                            }*/
                             MyAdapter adapter = new MyAdapter(MainActivity.this);
                             if(gridView != null)
                             {
@@ -239,10 +195,31 @@ public class MainActivity extends AppCompatActivity {
                             }
                             }
                     });
-                }
+
             }
 
         }).start();
+
+    }
+
+    private void deleteExistingImgFiles(){
+        File dir =getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File[] existingFiles = dir.listFiles();
+        // Delete existing images from directory
+        for(File file : existingFiles) {
+            try{
+                if(file.exists()) {
+                    System.out.print("Deleting file : " + file.getName());
+                    boolean result = file.delete();
+                    if(result) {
+                        System.out.println(", successful");
+                    }
+                }
+            }
+            catch (Exception e) {
+                System.out.println("Error while deleting file");
+            }
+        }
 
     }
 
