@@ -6,6 +6,7 @@ import androidx.core.content.ContextCompat;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.JsonReader;
 import android.view.View;
 import android.webkit.ValueCallback;
@@ -16,7 +17,11 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
+import java.io.File;
 import java.io.StringReader;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
     //public static final String EXTERNAL_URL = "externalUrl";
@@ -24,9 +29,11 @@ public class MainActivity extends AppCompatActivity {
     private WebView mWebView;
     private ProgressBar mProgressBar;
     private Button getSrcBtn;
-    private Button printUrlBtn;
+
     private String imageURLs;
     private String[] imageURLArray;
+
+    private ArrayList<String> destFileArray;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,14 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
         mWebView = findViewById(R.id.web_view);
         getSrcBtn = findViewById(R.id.getSrcBtn);
-        printUrlBtn = findViewById(R.id.printImgUrlBtn);
 
-        printUrlBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                printImageURLs();
-            }
-        });
 
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         getImgURLs(mWebView);
+
 
 
                     }
@@ -112,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
                 printImageURLs();
                 processImageUrlString();
                 //printImageURLs();
+                downloadImages();
 
             }
         });
@@ -130,18 +132,65 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     public void processImageUrlString() {
-        String updatedImageUrls = imageURLs.replace("\"","")
-                                            .replace("[","")
-                                            .replace("]","");
-        imageURLs =updatedImageUrls;
-        imageURLArray = imageURLs.split(",");
-/*        System.out.println("Length of imageURLArray = " + imageURLArray.length);
+
+
+        imageURLArray = imageURLs.replace("\"","")
+                                 .replace("[","")
+                                 .replace("]","")
+                                 .split(",");
+        System.out.println("Length of imageURLArray = " + imageURLArray.length);
         for (String url : imageURLArray) {
             System.out.println(url);
-        }*/
+        }
 
     }
     public void downloadImages() {
+        System.out.println("Executing downloadImages()...");
+        ImageDownloader downloader = new ImageDownloader();
+
+
+        new Thread (new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("entering new thread");
+                String destFilename;
+                File destFile;
+                File dir =getExternalFilesDir(Environment.DIRECTORY_PICTURES);;
+                File[] existingFiles = dir.listFiles();
+                // Delete existing images from directory
+                for(File file : existingFiles) {
+                    try{
+                        if(file.exists()) {
+                            System.out.print("Deleting file : " + file.getName());
+                            boolean result = file.delete();
+                            if(result) {
+                                System.out.println(", successful");
+                            }
+                        }
+                    }
+                    catch (Exception e) {
+                        System.out.println("Error while deleting file");
+                    }
+                }
+                int counter = 0;
+                DecimalFormat df = new DecimalFormat("00");
+                for (String imgURL : imageURLArray) {
+                    //destFilename =  "image_" + df.format(counter) + "_" + UUID.randomUUID().toString() + imgURL.lastIndexOf(".") + 1;
+                    destFilename =  "image_" + df.format(counter);
+                    counter++;
+                    System.out.println("Downloading image from: " + imgURL);
+
+                    destFile = new File(dir,destFilename);
+
+                    if(downloader.downloadImage(imgURL,destFile))
+                    {
+                        System.out.println("Downloaded file: " + destFilename);
+                    }
+
+                }
+            }
+
+        }).start();
 
     }
 
