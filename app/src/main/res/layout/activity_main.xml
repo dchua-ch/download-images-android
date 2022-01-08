@@ -25,22 +25,22 @@
         android:id="@+id/urlInput"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:text="Enter URL here"
+        android:layout_marginBottom="12dp"
 
 
-        android:layout_marginBottom="29dp"
+        android:text=""
 
-        app:layout_constraintBottom_toTopOf="@+id/gridView"
+        app:layout_constraintBottom_toBottomOf="@+id/getSrcBtn"
         app:layout_constraintEnd_toStartOf="@+id/getSrcBtn"
-        app:layout_constraintHorizontal_bias="0.534"
+        app:layout_constraintHorizontal_bias="0.528"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/getSrcBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="#1D2B3333"
-        android:text="Loading..."
+        android:backgroundTint="#2a9d95"
+        android:text="Fetch"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.945"

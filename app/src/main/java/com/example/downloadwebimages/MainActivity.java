@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.JsonReader;
 import android.view.View;
+import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -59,42 +60,47 @@ public class MainActivity extends AppCompatActivity {
 
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-        mWebView.setWebViewClient(new WebViewClient() {
+
+        getSrcBtn.setText("Fetch");
+        getSrcBtn.setBackgroundColor(Color.parseColor("#2a9d95"));
+        getSrcBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view,url);
-                System.out.println("page finished loading");
-                getSrcBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                       // externalUrl = urlInput.getText().toString();
-                        if(externalUrl != null)
-                            getImgURLs(mWebView);
-                    }
-                });
-                getSrcBtn.setText("Get Image URLs");
-                getSrcBtn.setBackgroundColor(Color.parseColor("#2a9d95"));
+            public void onClick(View view) {
+                externalUrl =urlInput.getText().toString();
+                if(URLUtil.isValidUrl(externalUrl))
+                    loadPage();
+
             }
-        }
-        );
-        mWebView.loadUrl(externalUrl);
+        });
+
+
 
 
 
     }
 
+    private void loadPage(){
+        mWebView.setWebViewClient(new WebViewClient() {
+                                      @Override
+                                      public void onPageFinished(WebView view, String url) {
+                                      super.onPageFinished(view,url);
+                                      System.out.println("page finished loading");
+                                      getImgURLs(mWebView);
+
+
+
+                                      }
+                                  }
+        );
+        mWebView.loadUrl(externalUrl);
+    }
+
     public void getImgURLs(WebView webView) {
-
         String javascriptFn = "(function() {let imageNodes = document.querySelectorAll(\"img\"); " +
-                              "let imageSrcs = new Array(); " +
-                              "for (let i = 0; i < 20; i++) {imageSrcs.push(imageNodes[i].src);} " +
-                              "return imageSrcs; })()";
-
-        String javascriptFn2 = "(function() {let imageNodes = document.querySelectorAll(\"img\"); " +
                                 "let imageSrcs = new Array(); " +
                                 "imageNodes.forEach(imageNode => imageSrcs.push(imageNode.src));" +
                                 "return imageSrcs; })()";
-        webView.evaluateJavascript(javascriptFn2, new ValueCallback<String>() {
+        webView.evaluateJavascript(javascriptFn, new ValueCallback<String>() {
             @Override
             public void onReceiveValue(String s) {
                 System.out.println("Callback for getImgURLs");
@@ -133,8 +139,6 @@ public class MainActivity extends AppCompatActivity {
         String[] tempStringArray = new String[20];
         int counter = 0;
         for (String url : imageURLArray) {
-           /* String fileType = url.substring(url.lastIndexOf("."));
-            System.out.println(url.substring(url.lastIndexOf(".")));*/
             if(counter > 19){
                 break;
             }
@@ -165,7 +169,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 System.out.println("entering new thread");
+
+                // Delete existing images on SD card
                 deleteExistingImgFiles();
+
                 String destFilename;
                 File destFile = null;
                 File dir =getExternalFilesDir(Environment.DIRECTORY_PICTURES);
