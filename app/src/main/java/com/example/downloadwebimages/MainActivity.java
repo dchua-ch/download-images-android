@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private Button getSrcBtn;
     private Button printUrlBtn;
     private String imageURLs;
+    private String[] imageURLArray;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,8 +107,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onReceiveValue(String s) {
                 System.out.println("Callback for getImgURLs");
-                System.out.println(s);
+                //System.out.println(s);
                 imageURLs = s;
+                printImageURLs();
+                processImageUrlString();
+                //printImageURLs();
+
             }
         });
 
@@ -123,6 +128,21 @@ public class MainActivity extends AppCompatActivity {
         catch (Exception e) {
             System.out.println("Error. Probably not done loading");
         }
+    }
+    public void processImageUrlString() {
+        String updatedImageUrls = imageURLs.replace("\"","")
+                                            .replace("[","")
+                                            .replace("]","");
+        imageURLs =updatedImageUrls;
+        imageURLArray = imageURLs.split(",");
+/*        System.out.println("Length of imageURLArray = " + imageURLArray.length);
+        for (String url : imageURLArray) {
+            System.out.println(url);
+        }*/
+
+    }
+    public void downloadImages() {
+
     }
 
 }
