@@ -65,8 +65,7 @@ public class MainActivity extends AppCompatActivity {
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
 
-        getSrcBtn.setText("Fetch");
-        getSrcBtn.setBackgroundColor(Color.parseColor("#2a9d95"));
+
         getSrcBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -90,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+
 
     private void loadPage(){
         mWebView.setWebViewClient(new WebViewClient() {
